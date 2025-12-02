@@ -11,15 +11,13 @@ struct ContentView: View {
     
     let predators = Predators()
     @State var searchText: String = ""
+    @State var alphabetical = false
+    @State var currentSelection = ApexPredatorModel.APType.all
+    
     var filteredDinos: [ApexPredatorModel]{
-        if searchText.isEmpty{
-            return predators.apexPredators
-        } else {
-//            return predators.apexPredators.filter({$0.name.lowercased().contains(searchText.lowercased())})
-            return predators.apexPredators.filter { predator in
-                predator.name.localizedCaseInsensitiveContains(searchText)
-            }
-        }
+        predators.filter(by: currentSelection)
+        predators.sort(by: alphabetical)
+        return predators.search(for: searchText)
     }
             
     var body: some View {
@@ -62,6 +60,29 @@ struct ContentView: View {
             .searchable(text: $searchText)
             .autocorrectionDisabled(true)
             .animation(.default, value: self.searchText)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        withAnimation (.bouncy) {
+                            alphabetical.toggle()
+                        }
+                    } label: {
+                        Image(systemName: alphabetical ? "textformat" : "film")
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu{
+                        Picker("filter", selection: $currentSelection.animation()) {
+                            ForEach(ApexPredatorModel.APType.allCases) { type in
+                                Label(type.rawValue.capitalized, systemImage: type.icon)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "slider.horizontal.3")
+                    }
+                }
+            }
         }
         .preferredColorScheme(.dark)
     }
