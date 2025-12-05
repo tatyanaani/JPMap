@@ -53,7 +53,7 @@ struct PredatorDetail: View {
                         .font(.largeTitle)
                     // dino location
                     NavigationLink{
-                        
+                        PredatorMap(position: position)
                     } label:{
                         Map(position: $position) {
                             Annotation(
