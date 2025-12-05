@@ -131,8 +131,8 @@ struct PredatorDetail: View {
                         .font(.caption)
                         .fontWeight(.bold)
                         .padding(.top, 10)
-                    if !predator.link.isEmpty {
-                        Link(predator.link, destination: URL(string: predator.link)!)
+                    if let url = URL(string: predator.link) {
+                        Link(predator.link, destination: url)
                             .font(.caption)
                             .foregroundStyle(.teal)
                     }
