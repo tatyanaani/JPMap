@@ -12,6 +12,7 @@ struct PredatorDetail: View {
     
     let predator: ApexPredatorModel
     @State var position: MapCameraPosition
+    @Namespace var namespace
     
     var body: some View {
         
@@ -53,7 +54,22 @@ struct PredatorDetail: View {
                         .font(.largeTitle)
                     // dino location
                     NavigationLink{
-                        PredatorMap(position: position)
+                        PredatorMap(
+                            position: .camera(
+                                MapCamera(
+                                    centerCoordinate: predator.location,
+                                    distance: 1000,
+                                    heading: 250,
+                                    pitch: 80
+                                )
+                            )
+                        )
+                            .navigationTransition(
+                                .zoom(
+                                    sourceID: 1,
+                                    in: namespace
+                                )
+                            )
                     } label:{
                         Map(position: $position) {
                             Annotation(
@@ -81,8 +97,10 @@ struct PredatorDetail: View {
                                 .background(.black.opacity(0.3))
                                 .clipShape(RoundedRectangle(cornerRadius: 5))
                         }
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .matchedTransitionSource(id: 1, in: namespace)
+                    
                     
                     // movies dino appears in
                     Text("Appears in:")
