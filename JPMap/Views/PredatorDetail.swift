@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct PredatorDetail: View {
     
     let predator: ApexPredatorModel
+    @State var position: MapCameraPosition
     
     var body: some View {
         
@@ -20,6 +22,21 @@ struct PredatorDetail: View {
                     Image(predator.type.rawValue)
                         .resizable()
                         .scaledToFit()
+                        .overlay {
+                            LinearGradient(
+                                stops: [
+                                    Gradient.Stop(
+                                        color: .clear,
+                                        location: 0.8
+                                    ),
+                                    Gradient.Stop(
+                                        color: .black,
+                                        location: 1
+                                    )],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        }
                     
                     // dino image
                     Image(predator.image)
@@ -35,11 +52,42 @@ struct PredatorDetail: View {
                     Text(predator.name)
                         .font(.largeTitle)
                     // dino location
+                    NavigationLink{
+                        
+                    } label:{
+                        Map(position: $position) {
+                            Annotation(
+                                predator.name,
+                                coordinate: predator.location
+                            ) {
+                                Image(systemName: "mappin.and.ellipse")
+                                    .foregroundStyle(.red)
+                                    .font(.largeTitle)
+                                    .symbolEffect(.pulse)
+                            }
+                            .annotationTitles(.hidden)
+                        }
+                        .frame(height: 150)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .overlay(alignment: .trailing){
+                            Image(systemName: "greaterthan")
+                                .font(.title)
+                                .padding(10)
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+                        .overlay(alignment: .topLeading){
+                            Text("Current Location")
+                                .padding(5)
+                                .background(.black.opacity(0.3))
+                                .clipShape(RoundedRectangle(cornerRadius: 5))
+                        }
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     
                     // movies dino appears in
                     Text("Appears in:")
                         .font(.title3)
-                        .padding(.top, 1)
+                        .padding(.top, 10)
                         .padding(.bottom, 2)
 
                     ForEach(predator.movies, id: \.self){movie in
@@ -68,6 +116,7 @@ struct PredatorDetail: View {
                     if !predator.link.isEmpty {
                         Link(predator.link, destination: URL(string: predator.link)!)
                             .font(.caption)
+                            .foregroundStyle(.teal)
                     }
                 }
                 .padding()
@@ -77,10 +126,19 @@ struct PredatorDetail: View {
             }
         }
         .ignoresSafeArea()
+        .toolbarBackground(.automatic)
     }
 }
 
 #Preview {
-    PredatorDetail(predator: Predators().apexPredators[0])
+    
+    let predator = Predators().apexPredators[10]
+    NavigationStack{
+        PredatorDetail(predator: predator, position: .camera(
+            MapCamera(
+                centerCoordinate: predator.location,
+                distance: 30000
+            )))
         .preferredColorScheme(.dark)
+    }
 }
