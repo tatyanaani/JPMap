@@ -13,6 +13,8 @@ struct PredatorMap: View {
     @State var position: MapCameraPosition
     let predators = Predators()
     
+    @State var showPopover: Bool = false
+    
     @State var satellite = false
     
     var body: some View {
@@ -27,6 +29,30 @@ struct PredatorMap: View {
                             .frame(height: 100)
                             .shadow(color: .white, radius: 3)
                             .scaleEffect(x: -1)
+                            .onTapGesture {
+                                showPopover.toggle()
+                            }
+                            .popover(isPresented: $showPopover, attachmentAnchor: .point(.top)) {
+                                VStack(alignment: .leading){
+                                    Text(predator.name)
+                                        .fontWeight(.bold)
+                                        .font(.title)
+                                    Text(predator.type.rawValue)
+                                        .font(.title2)
+                                        .padding(3)
+                                        .background(predator.type.background)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    Text("Movies")
+                                        .font(.title)
+                                        .padding(.vertical, 4)
+                                    ForEach(predator.movies, id: \.self){movie in
+                                        Text(movie)
+                                    }
+                                    
+                                }
+                                .padding(10)
+                                .presentationCompactAdaptation(.popover)
+                            }
                     }
             }
         }
